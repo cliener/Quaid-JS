@@ -1,0 +1,142 @@
+/* 
+ * CSS form rules
+ * 
+ * Default form layout rules
+ * 
+ * Version:  5.01
+ * Updated:  27/01/2012
+ * Author:   Roy Misso
+ * Changes:  Replaced '.submit input[type='submit']' selector to '.button' so the margin value can be applied to all buttons.
+ * 
+ */
+
+input[type='radio'], input[type='checkbox'] {
+  padding-left: 0;
+}
+
+input.default {
+  font-weight: bold;
+}
+
+label {
+  display: block;
+}
+.radio {
+  display: block;
+}
+.radio label {
+  display: inline;
+  margin-right: 1em;
+}
+
+/* form elements */
+
+fieldset {
+  border: 1px solid;
+  border-bottom: none;
+  padding-bottom: 1px;/* prevent margins from collapsing in Webkit clients */
+  margin-bottom: -1px;
+}
+fieldset fieldset {
+  margin: 12px;
+}
+fieldset.submit {
+  border-bottom: 1px solid;
+}
+.button {
+  margin-right: 12px;
+}
+fieldset p img {
+  vertical-align: text-top;
+}
+
+form h2 {
+  margin: 0;
+  padding: 9px 17px 11px;
+  border-bottom: 1px solid;
+  font: 24px/1 "helvetica neue", helvetica, arial, sans-serif;
+}
+form h3 {
+  margin: 0;
+  padding: 12px 17px 14px;
+  border-bottom: 1px solid;
+  font: bold 18px/1 "helvetica neue", helvetica, arial, sans-serif;
+}
+form h4 {
+  margin: 0;
+  padding: 8px 17px 8px;
+  border-bottom: 1px solid;
+  font: bold 14px/1.286 "helvetica neue", helvetica, arial, sans-serif;
+}
+fieldset fieldset h4 {
+  border-top: none;
+}
+form p {
+  margin: 0 0 12px;
+  padding: 0 17px;
+}
+fieldset h2+p, fieldset h3+p, fieldset h4+p {/* first paragraph */
+  margin-top: 12px;
+}
+fieldset.submit p {
+  margin-top: 12px;
+}
+form ol, form ul {
+	margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 44px;
+}
+form li {
+  margin: 0 0 12px;
+  padding: 0 17px 0 0;
+}
+form li p {
+  margin: 0;
+  padding: 0;
+}
+form .invalid em {
+  font-style: normal;
+  font-weight: bold;
+}
+em.errata {
+  display: block;
+  padding: 1px 5px 1px 21px;
+  color: #c00;
+  background: #fff url("/cdn/images/error.png") no-repeat 3px center;
+  font-style: normal;
+  font-weight: bold;
+}
+.ie7 em.errata {/* overcome reluctance to show longer error messages */
+  max-width: 300px;
+}
+.ie6 em.errata {
+  width: 300px;
+}
+
+p.error {
+  font-weight: bold;
+}
+p.feedback {
+  font-weight: bold;
+}
+p.hint {
+  margin-bottom: 0;
+}
+form p.hint {
+  margin-top: -12px;
+  margin-bottom: 12px;
+}
+p.help {
+  font-weight: bold;
+}
+p.check {
+  font-weight: bold;
+}
+p.check input {
+  float: left;
+  margin-top: 3px;
+}
+p.check label {
+/*  display: inline;*/
+  padding-left: 20px;
+}

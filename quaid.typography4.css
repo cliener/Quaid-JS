@@ -1,0 +1,72 @@
+/* 
+ * Typographical rules
+ * 
+ * Sets default fonts, sizes, margins and padding.
+ * 
+ * Version:  4.00
+ * Updated:  24/06/2011
+ * Author:   Chris Lienert
+ * Changes:  Updated to match reset3.css
+ * 
+ * With help from: Richard Rutter http://clagnut.com/
+ */
+
+body {
+  font: normal 13px/18px tahoma, geneva, verdana, sans-serif;
+}
+h1,
+h2,
+h3,
+h4,
+h5 {
+  text-rendering: optimizelegibility;
+}
+h1 {
+  font: normal 30px/1 "helvetica neue", helvetica, arial, sans-serif;
+  margin-bottom: 24px;
+}
+h2 {
+  font: normal 24px/1 "helvetica neue", helvetica, arial, sans-serif;
+  margin: 18px 0 12px;
+}
+h3 {
+  font: normal 18px/1 "helvetica neue", helvetica, arial, sans-serif;
+  margin: 18px 0 9px;
+}
+h4 {
+  font: normal 15px/1.286 "helvetica neue", helvetica, arial, sans-serif;
+  margin: 10px 0 7px;
+}
+h5 {
+  font: bold 13px/1.385 "helvetica neue", helvetica, arial, sans-serif;
+  margin: 12px 0 7px;
+}
+
+p, ul, ol, dl, address, table, pre {
+	margin-top: 9px;
+  margin-bottom: 18px;
+}
+
+/* see http://blog.fontdeck.com/post/9037028497/hyphens */
+p {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}
+
+pre {
+	overflow: auto;
+}
+form {
+  margin-bottom: 18px;
+}
+
+/* remove unwanted margins */
+ul ul, ol ol, ol ul, ul ol {
+	margin-bottom: 0;
+}
+
+dt {
+	font-weight: bold;
+	margin-top: 9px;
+}
