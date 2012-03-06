@@ -5,10 +5,10 @@
 * 
 * Validation rules are set via input type, attributes, class names and custom methods
 * 
-* Version:  4.0.1
-* Updated:  10/01/2012
+* Version:  4.0.2
+* Updated:  06/03/2012
 * Author:   Chris Lienert
-* Changes:  Added $.initFormValidation method to initialise form validation
+* Changes:  Fixed async setting for AJAX validation
 * 
 * Requires: jQuery 1.6.x
 *           Modernizr 2.x
@@ -242,7 +242,7 @@ $(function () {
       self.validate = function (submit) {
         $.ajax({ url: self.settings.path + self.settings.getValue() + "&caller=" + self.target.id,
           dataType: 'json',
-          async: submit,
+          async: !submit,
           context: self.target,
           success: self.settings.handler
         });
