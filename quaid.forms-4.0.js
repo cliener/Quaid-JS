@@ -5,10 +5,11 @@
 * 
 * Validation rules are set via input type, attributes, class names and custom methods
 * 
-* Version:  4.0.2
-* Updated:  06/03/2012
+* Version:  4.0.3
+* Updated:  08/03/2012
 * Author:   Chris Lienert
-* Changes:  Fixed async setting for AJAX validation
+* Changes:  Added a hook for postcode fields to predictOzState where the attribute data-state-field is set to the target state id
+*           Class "phone" is no longer required for phone validation of input type="tel"
 * 
 * Requires: jQuery 1.6.x
 *           Modernizr 2.x
@@ -57,6 +58,7 @@ jQuery(function ($) {
       });
     },
     predictOzState: function (target) {//pre-empts an Australian state based on a postcode see: http://en.wikipedia.org/wiki/Postcodes_in_Australia
+      //todo: change this to predictState and move the data-state-field attribute
       return this.change(function () {
         var postcode = $(this).val();
         var state = "";
@@ -138,6 +140,14 @@ jQuery(function ($) {
           }
         }
       });
+      //init postcode state predictor
+      this.filter("." + $.validator.rule.postcode).each(function () {
+        var $this = $(this);
+        if ($this.attr("data-state-field")) {
+          $this.predictOzState("#" + $this.attr("data-state-field"));
+        }
+      });
+      //init radios
       this.filter(":not[:radio]").blur(function () {
         if ((!(this.required || $(this).attr("required") == "required") && this.value == "") || this.value != "") {
           this.checkValid();
@@ -146,6 +156,7 @@ jQuery(function ($) {
       this.filter("input:radio, input:checkbox").click(function () {
         this.checkValid();
       });
+      //change event for selects
       this.filter("select").change(function () {
         if (this.value != "") {
           this.checkValid();
@@ -356,16 +367,17 @@ $(function () {
             return false;
           }
           break;
-        case "tel":
-          if ($self.hasClass($.validator.rule.mobile) && !(self.isValid = $.validator.isMobile(self.value) || self.value.length === 0)) {
-            self.errorMessage = $.validator.message.mobile;
-            return false;
+          if ($self.hasClass($.validator.rule.mobile)) {
+            if (!(self.isValid = $.validator.isMobile(self.value) || self.value.length === 0)) {
+              self.errorMessage = $.validator.message.mobile;
+              return false;
+            }
+          } else {
+            if (!(self.isValid = $.validator.isPhoneNumber(self.value) || self.value.length === 0)) {
+              self.errorMessage = $.validator.message.phone;
+              return false;
+            }
           }
-          if ($self.hasClass($.validator.rule.phone) && !(self.isValid = $.validator.isPhoneNumber(self.value) || self.value.length === 0)) {
-            self.errorMessage = $.validator.message.phone;
-            return false;
-          }
-          break;
         case "text": //additional validation classes for text inputs
           if ($self.hasClass($.validator.rule.no_whitespace) && !(self.isValid = $.trim(self.value).length > 0 || self.value.length === 0)) {
             self.errorMessage = $.validator.message.whitespace;
