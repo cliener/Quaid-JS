@@ -5,11 +5,10 @@
 * 
 * Validation rules are set via input type, attributes, class names and custom methods
 * 
-* Version:  4.0.3
-* Updated:  08/03/2012
+* Version:  4.0.4
+* Updated:  12/03/2012
 * Author:   Chris Lienert
-* Changes:  Added a hook for postcode fields to predictOzState where the attribute data-state-field is set to the target state id
-*           Class "phone" is no longer required for phone validation of input type="tel"
+* Changes:  Added a hook for conditionally required fields by setting attributes data-required-field and data-required-value
 * 
 * Requires: jQuery 1.6.x
 *           Modernizr 2.x
@@ -320,6 +319,12 @@ $(function () {
       if (self.disabled || self.readOnly || $self.is(":hidden")) {
         return true; //don't validate missing, disabled or hidden fields
       }
+      //check for conditional validation
+      if ($self.attr("data-required-field")) {
+        var reqField = $("#" + $self.attr("data-required-field"));
+        self.required = reqField.attr("checked") || reqField.val() == $self.attr("data-required-value");
+      }
+
       var type = $self.attr("type");
       //missing value
       if (self.required || $self.attr("required") == "required") {
