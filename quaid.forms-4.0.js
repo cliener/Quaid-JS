@@ -1,18 +1,22 @@
 /*
 * Quaid.Forms
-* 
+*
 * Contains various form extention and validation methods.
-* 
+*
 * Validation rules are set via input type, attributes, class names and custom methods
 * 
-* Version:  4.0.4
-* Updated:  12/03/2012
+* Version:  4.0.6
+* Updated:  3/08/2012
 * Author:   Chris Lienert
-* Changes:  Added a hook for conditionally required fields by setting attributes data-required-field and data-required-value
+* Changes:  Added integer validation.
+*           Error messages are now contained in labels instead of ems
+*           Shifted styles from label.errata to form5.css
+*           Added ARIA states to fields ala http://www.punkchip.com/2010/12/aria-enhance-form-validation/
+*           Added data-visible-field and accompanying setFieldToggle and toggleField methods to hide/show elements based on field values
 * 
 * Requires: jQuery 1.6.x
-*           Modernizr 2.x
-*           Quaid Core 2.x (quaid.core-2.x.js)
+* Modernizr 2.x
+* Quaid Core 2.x (quaid.core-2.x.js)
 */
 jQuery(function ($) {
   $.extend($.fn, {
@@ -142,8 +146,8 @@ jQuery(function ($) {
       //init postcode state predictor
       this.filter("." + $.validator.rule.postcode).each(function () {
         var $this = $(this);
-        if ($this.attr("data-state-field")) {
-          $this.predictOzState("#" + $this.attr("data-state-field"));
+        if ($this.data("stateField")) {
+          $this.predictOzState("#" + $this.data("stateField"));
         }
       });
       //init radios
@@ -152,8 +156,18 @@ jQuery(function ($) {
           this.checkValid();
         }
       });
-      this.filter("input:radio, input:checkbox").click(function () {
-        this.checkValid();
+      this.filter("input:radio, input:checkbox").each(function(){
+        this.parent = $(this).closest($.validator.parentElements);
+        if (this.type === "radio") {
+          this.label = $(this).parent("label");
+        } else {
+         this.label = this.parent.find("label[for='" + this.id + "']");
+        }
+      })
+      .click(function () {
+        this.parent.find("input[name='" + this.name + "']").each(function(){
+          this.checkValid()
+        })
       });
       //change event for selects
       this.filter("select").change(function () {
@@ -206,6 +220,29 @@ jQuery(function ($) {
 
       $($.validator.validatedFields, this).initValidation();
       return this;
+    },
+    //hide/show a target element based on the value of a form field.
+    setFieldToggle: function (target){
+      return this.each(function(){
+        var $this = $(this);
+        $this.change(function(){
+          $this.toggleField(target);
+        });
+        //set initial state
+        $this.toggleField(target,0);
+      });
+    },
+    toggleField: function(target,duration){
+      return this.each(function () {
+        if (!duration){
+          duration = "fast";
+        }
+        if (this.checked || this.value === target.data("visibleValue")) {
+          target.slideDown(duration);
+        } else {
+          target.slideUp(duration);
+        }
+      });
     }
   });
 });
@@ -280,24 +317,21 @@ $(function () {
     },
     //displays an em inside the parent element containing the element's error message
     displayError: function () {
-      //todo: abstract this.parent
-      if (!this.parent) {
-        this.parent = $(this).closest($.validator.parentElements);
-      }
       if (this.isValid) {
         return;
       }
+      if (!this.parent) {
+        this.parent = $(this).closest($.validator.parentElements);
+      }
+      if (this.label) {
+        this.label.addClass("alert");
+      }
       if (!this.error) {
-        this.error = $("<em class=\"errata\"/>")
-        .css({
-          zIndex: "100",
-          position: "absolute",
-          border: "1px solid #BFC1C9",
-          boxShadow: "0 1px 2px #C1C1C1"
-        });
+        this.error = $("<label for=\"" + this.id + "\" role=\"alert\" class=\"errata js-hover\"/>");
       }
       this.error.html(this.errorMessage).appendTo(this.parent).hide();
-      $(this).addClass("invalid");
+      $(this).addClass("invalid")
+      .attr("aria-invalid", "true");
     },
     //clears any errors associated with this element
     clearError: function () {
@@ -306,7 +340,11 @@ $(function () {
         this.parent = $(this).closest($.validator.parentElements);
       }
       this.parent.children(".server-error").remove();
-      $(this).removeClass("invalid");
+      if (this.label) {
+        this.label.removeClass("alert");
+      }
+      $(this).removeClass("invalid")
+      .removeAttr("aria-invalid");
       if (this.error) {
         this.error.hide();
       }
@@ -320,9 +358,9 @@ $(function () {
         return true; //don't validate missing, disabled or hidden fields
       }
       //check for conditional validation
-      if ($self.attr("data-required-field")) {
-        var reqField = $("#" + $self.attr("data-required-field"));
-        self.required = reqField.attr("checked") || reqField.val() == $self.attr("data-required-value");
+      if ($self.data("requiredField")) {
+        var reqField = $("#" + $self.data("requiredField"));
+        self.required = reqField.attr("checked") || reqField.val() == $self.data("requiredValue");
       }
 
       var type = $self.attr("type");
@@ -372,6 +410,7 @@ $(function () {
             return false;
           }
           break;
+        case "tel":
           if ($self.hasClass($.validator.rule.mobile)) {
             if (!(self.isValid = $.validator.isMobile(self.value) || self.value.length === 0)) {
               self.errorMessage = $.validator.message.mobile;
@@ -383,6 +422,7 @@ $(function () {
               return false;
             }
           }
+          break;
         case "text": //additional validation classes for text inputs
           if ($self.hasClass($.validator.rule.no_whitespace) && !(self.isValid = $.trim(self.value).length > 0 || self.value.length === 0)) {
             self.errorMessage = $.validator.message.whitespace;
@@ -408,14 +448,18 @@ $(function () {
             self.errorMessage = $.validator.message.number;
             return false;
           }
-          if ($self.hasClass($.validator.rule.positive_numeric) && !(self.isValid = (!isNaN(self.value) && self.value.indexOf("-") == -1) || self.value.length === 0)) {
+          if ($self.hasClass($.validator.rule.positive_numeric) && !(self.isValid = (!isNaN(self.value) && self.value.indexOf("-") === -1) || self.value.length === 0)) {
             self.errorMessage = $.validator.message.positiveNumber;
             return false;
           }
-          //case $.validator.rule.integer:
-          //"Not done yet!";
-          //case $.validator.rule.positive_integer:
-          //"Not done yet!";
+          if ($self.hasClass($.validator.rule.integer) && !(self.isValid = (!isNaN(self.value) && self.value.indexOf(".") === -1) || self.value.length === 0)) {
+            self.errorMessage = $.validator.message.integer;
+            return false;
+          }
+          if ($self.hasClass($.validator.rule.positive_integer) && !(self.isValid = (!isNaN(self.value) && self.value.indexOf("-") === -1 && self.value.indexOf(".") === -1) || self.value.length === 0)) {
+            self.errorMessage = $.validator.message.positiveInteger;
+            return false;
+          }
           if ($self.hasClass($.validator.rule.currency) && !(self.isValid = $.validator.isCurrency(self.value) || self.value.length === 0)) {
             self.errorMessage = $.validator.message.currency;
             return false;
@@ -477,7 +521,7 @@ $(function () {
   .initFormValidation();
 
   //capture and claim any server validation
-  $(".invalid em.server-error", $forms).each(function (i) {
+  $(".invalid label.server-error", $forms).each(function (i) {
     var $this = $(this);
     $("[id^=" + this.className.replace(/.*\sfor-(\w*).*/, "$1") + "]", $forms).each(function (j) {
       this.errorMessage = $this.html();
@@ -489,5 +533,11 @@ $(function () {
       }
     });
     $this.remove();
+  });
+
+  //initialise visibility toggling fields
+  $("[data-visible-field]").each(function(){
+    var $this = $(this);
+    $("#" + $this.data("visibleField")).setFieldToggle($this)
   });
 });
