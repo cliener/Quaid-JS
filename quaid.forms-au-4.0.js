@@ -3,10 +3,11 @@
 * 
 * Contains various Australia specific validation rules and error messages
 * 
-* Version:  4.0 (in sync with quaid.forms-4.0.js)
-* Updated:  4/08/2011
+* Version:  4.0.6 (in sync with quaid.forms-4.0.js)
+* Updated:  1/08/2012
 * Author:   Chris Lienert
-* Changes:  Updated to match quaid.forms-4.0.js
+* Changes:  Added integer validation
+*           Updated error messages
 *
 * Requires: jQuery 1.6.x
 *           Quaid Core 2.x (quaid.core-2.x.js)
@@ -37,7 +38,7 @@ $(function () {
       return (/^-?(\d+|\d{1,3}(,\d{3})+)(\.\d+)?$/.test(d));
     },
     isCurrency: function (c) {
-      return this.isDecimal(c.replace(/[\$€£,]/g, "")) && (/^-?[\$€£]?[0-9,]+(\.\d{2})?$/.test(c));
+      return this.isDecimal(c.replace(/[\$â‚¬Â£,]/g, "")) && (/^-?[\$â‚¬Â£]?[0-9,]+(\.\d{2})?$/.test(c));
     },
     isPostCode: function (p) {
       return /^\d{4}$/.test(p);
@@ -58,10 +59,10 @@ $(function () {
     },
     message: {
       submitFailed: "The form could not be submitted. Please refer to the highlighted field(s) for further instructions.",
-      required: "Value not entered",
-      whitespace: "Value not entered",
-      selectRequired: "Value not selected",
-      radioRequired: "Answer not indicated",
+      required: "Please enter a value",
+      whitespace: "Please enter a value",
+      selectRequired: "Please select a value",
+      radioRequired: "Please check an answer",
       checkRequired: "Please check the box",
       email: "Email address entered is not valid",
       mobile: "Mobile number entered is not valid e.g. 0412 345 678",
@@ -72,9 +73,11 @@ $(function () {
       date: "Date entered is not valid e.g. 05/10/2007",
       time: "Time entered is not valid e.g. 13:55",
       year: "Year entered is not valid",
-      number: "Value entered is not a valid number",
-      positiveNumber: "Value entered is not a valid positive number",
-      currency: "Value entered is not valid",
+      number: "Please enter a valid number",
+      positiveNumber: "Please enter a valid positive number",
+      integer: "Please enter a whole number without decimals.",
+      positiveInteger: "Please enter a positive whole number without decimals.",
+      currency: "Please enter a valid number",
       credit_card: "Credit card number entered is not valid",
       csc: "CSC number entered is not valid"
     }
