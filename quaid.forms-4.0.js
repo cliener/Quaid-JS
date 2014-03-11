@@ -5,16 +5,12 @@
 *
 * Validation rules are set via input type, attributes, class names and custom methods
 * 
-* Version:  4.0.6
-* Updated:  3/08/2012
+* Version:  4.0.21
+* Updated:  21/2/2014
 * Author:   Chris Lienert
-* Changes:  Added integer validation.
-*           Error messages are now contained in labels instead of ems
-*           Shifted styles from label.errata to form5.css
-*           Added ARIA states to fields ala http://www.punkchip.com/2010/12/aria-enhance-form-validation/
-*           Added data-visible-field and accompanying setFieldToggle and toggleField methods to hide/show elements based on field values
+* Changes:  Added check to prevent error on .NET MVC's hidden checkboxes
 * 
-* Requires: jQuery 1.6.x
+* Requires: jQuery 1.7.x
 * Modernizr 2.x
 * Quaid Core 2.x (quaid.core-2.x.js)
 */
@@ -110,9 +106,13 @@ jQuery(function ($) {
           return $(this).val() != this.originalValue;
         };
       })
-      .focus($.validator.showError)
-      .hover($.validator.showError, $.validator.hideError)
-      .blur($.validator.hideError);
+      .on({
+        touchstart: $.validator.showError,
+        focus: $.validator.showError,
+        mouseenter: $.validator.showError,
+        mouseleave: $.validator.hideError,
+        blur: $.validator.hideError
+      });
       //trim spaces
       this.filter("input[type=email]").blur(function () {
         this.value = $.trim(this.value);
@@ -151,7 +151,7 @@ jQuery(function ($) {
         }
       });
       //init radios
-      this.filter(":not[:radio]").blur(function () {
+      this.filter("input:not(:radio)").blur(function () {
         if ((!(this.required || $(this).attr("required") == "required") && this.value == "") || this.value != "") {
           this.checkValid();
         }
@@ -165,13 +165,21 @@ jQuery(function ($) {
         }
       })
       .click(function () {
-        this.parent.find("input[name='" + this.name + "']").each(function(){
-          this.checkValid()
-        })
+        this.parent.find("input[name='" + this.name + "']").each(function() {
+          if (this.checkValid) {
+            this.checkValid();
+          }
+        });
       });
       //change event for selects
       this.filter("select").change(function () {
         if (this.value != "") {
+          this.checkValid();
+        }
+      });
+      //change event for textarea elements
+      this.filter("textarea").change(function () {
+        if ((!(this.required || $(this).attr("required") == "required") && this.value == "") || this.value != "") {
           this.checkValid();
         }
       });
@@ -234,10 +242,20 @@ jQuery(function ($) {
     },
     toggleField: function(target,duration){
       return this.each(function () {
-        if (!duration){
+        if (!duration && duration !== 0){
           duration = "fast";
         }
-        if (this.checked || this.value === target.data("visibleValue")) {
+        var visibleValue = target.data("visibleValue");
+        if (!visibleValue) {
+          visibleValue = null;
+        } else {
+          visibleValue = String(visibleValue).split("|");
+        }
+        var isRadio = $(this).is(":radio");
+        var isCheckbox = $(this).is(":checkbox");
+        if ((isRadio && $("input[name=" + target.data("visibleName") + "]:checked").val() == visibleValue)
+            || (isCheckbox && (visibleValue === null || visibleValue.indexOf(this.value) !== -1) && this.checked)
+            || (!isRadio && !isCheckbox && visibleValue.indexOf(this.value) !== -1)) {
           target.slideDown(duration);
         } else {
           target.slideUp(duration);
@@ -252,6 +270,41 @@ $(function () {
   $.validator = function () {
   };
   $.extend($.validator, {
+    // Must be implemented by region specific versions
+    isDate: function () { return true; },
+    fixTime: function () { },
+    isYear: function () { return true; },
+    isTime: function () { return true; },
+    isMail: function () { return true; },
+    isDecimal: function () { return true; },
+    isCurrency: function () { return true; },
+    isPostCode: function () { return true; },
+    isPhoneNumber: function () { return true; },
+    isMobile: function () { return true; },
+    isCCNumber: function () { return true; },
+    isCSC: function () { return true; },
+    message: {
+      submitFailed: null,
+      required: null,
+      whitespace: null,
+      selectRequired: null,
+      radioRequired: null,
+      checkRequired: null,
+      email: null,
+      mobile: null,
+      phone: null,
+      postcode: null,
+      date: null,
+      time: null,
+      year: null,
+      number: null,
+      positiveNumber: null,
+      integer: null,
+      positiveInteger: null,
+      currency: null,
+      credit_card: null,
+      csc: null
+    },
     rule: {//Set of validation rules used to validate form fields
       no_whitespace: "no_whitespace",
       mobile: "mobile",
@@ -346,7 +399,7 @@ $(function () {
       $(this).removeClass("invalid")
       .removeAttr("aria-invalid");
       if (this.error) {
-        this.error.hide();
+        this.error.remove();
       }
     },
     //performs validation of the field's value
@@ -360,10 +413,16 @@ $(function () {
       //check for conditional validation
       if ($self.data("requiredField")) {
         var reqField = $("#" + $self.data("requiredField"));
-        self.required = reqField.attr("checked") || reqField.val() == $self.data("requiredValue");
+        var reqValue = $self.data("requiredValue");
+        if (!reqValue) {
+          reqValue = null;
+        } else {
+          reqValue = String(reqValue).split("|");
+        }
+        self.required = reqField.prop("checked") || reqValue != null && reqValue.indexOf(reqField.val()) !== -1;
       }
 
-      var type = $self.attr("type");
+      var type = $self.prop("type");
       //missing value
       if (self.required || $self.attr("required") == "required") {
         switch (type) {
@@ -394,8 +453,14 @@ $(function () {
               return false;
             }
             break;
-          default:
+          case "password":
             if (!(self.isValid = self.value.length !== 0)) {
+              self.errorMessage = $.validator.message.required;
+              return false;
+            }
+            break;
+          default:
+            if (!(self.isValid = $.trim(self.value).length !== 0)) {
               self.errorMessage = $.validator.message.required;
               return false;
             }
@@ -523,7 +588,7 @@ $(function () {
   //capture and claim any server validation
   $(".invalid label.server-error", $forms).each(function (i) {
     var $this = $(this);
-    $("[id^=" + this.className.replace(/.*\sfor-(\w*).*/, "$1") + "]", $forms).each(function (j) {
+    $("[id=" + this.className.replace(/.*\sfor-(\w*).*/, "$1") + "]", $forms).each(function (j) {
       this.errorMessage = $this.html();
       this.isValid = false;
       this.displayError();
@@ -538,6 +603,10 @@ $(function () {
   //initialise visibility toggling fields
   $("[data-visible-field]").each(function(){
     var $this = $(this);
-    $("#" + $this.data("visibleField")).setFieldToggle($this)
+    $("#" + $this.data("visibleField")).setFieldToggle($this);
+  });
+  $("[data-visible-name]").each(function(){
+    var $this = $(this);
+    $('input[name="' + $this.data("visibleName") + '"]').setFieldToggle($this);
   });
 });
