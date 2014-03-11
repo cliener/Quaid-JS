@@ -3,18 +3,17 @@
  * 
  * Default form layout rules
  * 
- * Version:  5.03
- * Updated:  29/06/2012
+ * Version:  5.1.2
+ * Updated:  11/03/2014
  * Author:   Chris Lienert
- * Changes:  Added form styles from reset3.css
- *           Added error hover styles from quaid.forms-4.0.js
+ * Changes:  Updated to match internal build
  * 
  */
 textarea { overflow: auto; } /* www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
 
 /* Align checkboxes, radios, text inputs with their label by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css ; */
-input[type="radio"] { vertical-align: text-bottom; }
-input[type="checkbox"] { vertical-align: text-bottom; }
+input[type="radio"] { vertical-align: baseline; }
+input[type="checkbox"] { vertical-align: baseline; }
 .ie7 input[type="checkbox"] { vertical-align: baseline; }
 .ie6 input { vertical-align: text-bottom; }
 
@@ -33,8 +32,8 @@ textarea, input[type="text"], input[type="password"], input[type="email"], input
   font: 1em/1.2 "Helvetica neue", Arial, sans-serif;
 }
 input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="url"] {
-  height: 1.2em;
-  padding: 2px;
+  height: 1.375em;
+  padding: 0 2px;
 }
 input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="url"]:focus, select:focus, textarea:focus, 
 input[type="text"]:hover, input[type="password"]:hover, input[type="email"]:hover, input[type="tel"]:hover, input[type="url"]:hover, select:hover, textarea:hover {
@@ -100,17 +99,8 @@ label {
 
 /* form elements */
 
-fieldset {
-  border: 1px solid;
-  border-bottom: none;
-  padding-bottom: 1px;/* prevent margins from collapsing in Webkit clients */
-  margin-bottom: -1px;
-}
 fieldset fieldset {
   margin: 12px;
-}
-fieldset.submit {
-  border-bottom: 1px solid;
 }
 .button {
   margin-right: 12px;
@@ -121,39 +111,28 @@ fieldset p img {
 
 form h2 {
   margin: 0;
-  padding: 9px 17px 11px;
-  border-bottom: 1px solid;
-  font: 24px/1 "helvetica neue", helvetica, arial, sans-serif;
 }
 form h3 {
   margin: 0;
-  padding: 12px 17px 14px;
-  border-bottom: 1px solid;
-  font: bold 18px/1 "helvetica neue", helvetica, arial, sans-serif;
+  padding: 0 0 0.5em;
 }
 form h4 {
   margin: 0;
-  padding: 8px 17px 8px;
-  border-bottom: 1px solid;
-  font: bold 14px/1.286 "helvetica neue", helvetica, arial, sans-serif;
-}
-fieldset fieldset h4 {
-  border-top: none;
 }
 form p {
-  margin: 0 0 12px;
-  padding: 0 17px;
+  margin: 0 0 1.375em;
+  padding: 0;
 }
 fieldset h2+p, fieldset h3+p, fieldset h4+p {/* first paragraph */
-  margin-top: 12px;
+  margin-top: 0.5em;
 }
 fieldset.submit p {
-  margin-top: 12px;
+  margin-top: 1em;
 }
 form ol, form ul {
   margin-top: 0;
   margin-bottom: 0;
-  margin-left: 44px;
+  margin-left: 1em;
 }
 form li {
   margin: 0 0 12px;
@@ -165,7 +144,7 @@ form li p {
 }
 label.errata {
   display: block;
-  padding: 1px 5px 1px 21px;
+  padding: 1px 5px 1px 1.25em;
   color: #c00;
   background: url("/cdn/images/error.png") no-repeat 3px center;
   font-style: normal;
@@ -181,9 +160,6 @@ label.js-hover {
   z-index: 100;
   position: absolute;
   border: 1px solid #bfc1c9;
-  -moz-box-shadow: 0 1px 2px #c1c1c1; 
-  -webkit-box-shadow: 0 1px 2px #c1c1c1;
-  box-shadow: 0 1px 2px #c1c1c1;
   background-color: #fff;
 }
 
@@ -211,6 +187,5 @@ p.check input {
   margin-top: 3px;
 }
 p.check label {
-/*  display: inline;*/
   padding-left: 20px;
 }
