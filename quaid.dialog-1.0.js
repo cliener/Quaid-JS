@@ -5,10 +5,10 @@
 * 
 * Essentially a lighter weight version of the jQuery UI Dialog
 * 
-* Version:  1.02
-* Updated:  18/11/2010
+* Version:  1.03
+* Updated:  25/09/2012
 * Author:   Chris Lienert
-* Changes:  Added noOverlay boolean to open() function to optionally suppress the overlay
+* Changes:  BUG-FIX: Make the dialog modal overlay span the height of the document, not just the visible window
 * 
 * Requires: jQuery 1.4.x or later
 */
@@ -21,6 +21,7 @@ jQuery(function ($) {
       _init: function () {//initialisation
         var self = this;
         self._overlay = $('<div class=\"dialog-overlay\"></div>').appendTo(document.body).hide(); //modal overlay. Style this to prevent access to elements behind the dialog
+        self._overlay.css("height", $(document).height() + "px"); //make the overlay span the height of the document
         self.box = $("<div class=\"dialog\"></div>")//add the dialog
           .append(self.element).appendTo(document.body)
           .hide();
