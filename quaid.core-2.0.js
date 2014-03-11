@@ -3,18 +3,13 @@
 * 
 * Core JavaScript methods and prototyped extensions.
 * 
-* Version:  2.0
-* Updated:  16/09/2011
+* Version:  2.0.1
+* Updated:  16/09/2013
 * Author:   Chris Lienert
-* Changes:  Revised and updated from common.js
-*           Added detector for string.trim() prototype to allow native methods to take precedence
-*           Added Array.forEach prototype for older clients
-*           Added Autofocus, Placeholder and TextArea maxlength HTML5 attribute support fo older clients
-*           Changed toJsDate method to string prototyped string.toDate() with smarter two digit year conversion
-*           Changed namespaces to be consistent with JavaScript syntax i.e. quaid.Date -> quaid.date
-*           Removed quaid.setOptional method. This has been replaced by $.setToggle() in quaid.forms
+* Changes:  Replaced usages of deprecated jQuery .live() [http://api.jquery.com/live/] method with .on() [http://api.jquery.com/on/].
+*           Minimum jQuery requirement increased to version 1.7.
 * 
-* Requires: jQuery 1.6.x
+* Requires: jQuery 1.7.x
 *           Modernizr 2.x
 */
 $.ajaxSettings.traditional = true; //see http://api.jquery.com/jQuery.param/
