@@ -3,10 +3,10 @@
 * 
 * Adds a DatePicker to any input elements with class "date".
 * 
-* Version:  5.6
-* Updated:  05/08/2011
+* Version:  5.6.2
+* Updated:  29/01/2013
 * Author:   Chris Lienert
-* Changes:  Updated to match quaid.core-2.x and quaid.forms-4.x
+* Changes:  Fixed table offset calculation again.
 * 
 * Requires: jQuery
 *           Quaid Core (quaid.core-2.x.js)
@@ -224,7 +224,7 @@ quaid.datePicker = function () {
       $(this.table).css({
         position: "absolute",
         top: offset.top + $t.outerHeight(),
-        left: offset.left - $(":first", document.body).offset().left - ($(this.table).outerWidth() - $t.outerWidth()) / 2
+        left: offset.left - ($(":first", document.body).css("position") === "static" ? $(":first", document.body).offset().left : 0) - ($(this.table).outerWidth() - $t.outerWidth()) / 2
       });
     };
     this.add = function (el) {
